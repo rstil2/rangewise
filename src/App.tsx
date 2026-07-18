@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Onboarding } from "./components/Onboarding";
 import { GamePage } from "./pages/GamePage";
 import { StatsPage } from "./pages/StatsPage";
 import { PrivacyPage } from "./pages/PrivacyPage";
+import { SupportPage } from "./pages/SupportPage";
 
 const ONBOARDING_KEY = "rangewise_onboarding_done";
 
-function App() {
+function AppRoutes() {
+  const location = useLocation();
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -19,21 +21,31 @@ function App() {
     setShowOnboarding(false);
   };
 
-  if (showOnboarding === null) {
+  const isPublicLegal =
+    location.pathname === "/privacy" || location.pathname === "/support";
+
+  if (showOnboarding === null && !isPublicLegal) {
     return null;
   }
 
-  if (showOnboarding) {
+  if (showOnboarding && !isPublicLegal) {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
   return (
+    <Routes>
+      <Route path="/" element={<GamePage />} />
+      <Route path="/stats" element={<StatsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/support" element={<SupportPage />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<GamePage />} />
-        <Route path="/stats" element={<StatsPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-      </Routes>
+      <AppRoutes />
     </BrowserRouter>
   );
 }
