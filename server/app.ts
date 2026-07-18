@@ -67,11 +67,9 @@ function computeStreak(guesses: GuessRecord[]): number {
 export function createApp() {
   const app = express();
   app.set("trust proxy", 1);
-  app.use(
-    cors({
-      origin: config.corsOrigin === "*" ? true : config.corsOrigin.split(","),
-    }),
-  );
+  // Public anonymous API: allow all origins so the native app
+  // (capacitor://localhost) and any web origin can call it.
+  app.use(cors());
   app.use(express.json({ limit: "16kb" }));
 
   app.get("/api/question/today", (_req, res) => {
